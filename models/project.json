@@ -1,24 +1,24 @@
 {
-  "name": "dtos",
+  "name": "models",
   "$schema": "../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "dtos/src",
+  "sourceRoot": "models/src",
   "projectType": "library",
   "targets": {
     "build": {
       "executor": "@nx/js:tsc",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/dtos",
-        "main": "dtos/src/index.ts",
-        "tsConfig": "dtos/tsconfig.lib.json",
-        "assets": ["dtos/*.md"]
+        "outputPath": "dist/models",
+        "main": "models/src/index.ts",
+        "tsConfig": "models/tsconfig.lib.json",
+        "assets": ["models/*.md"]
       }
     },
     "lint": {
       "executor": "@nx/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["dtos/**/*.ts"]
+        "lintFilePatterns": ["models/**/*.ts"]
       }
     }
   },

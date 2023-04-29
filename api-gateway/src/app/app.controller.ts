@@ -1,8 +1,9 @@
-import { Body, Controller, Get, Logger, Param, Post, UsePipes, ValidationPipe } from "@nestjs/common";
-import { ClientProxy, ClientProxyFactory, Transport }                           from "@nestjs/microservices";
-import { ConfigService }                                                        from "@nestjs/config";
-import { Observable }                     from "rxjs";
-import { CategoryDto, CreateCategoryDto } from "dtos";
+import { Body, Controller, Get, Logger, Param, Post } from "@nestjs/common";
+import { ClientProxy, ClientProxyFactory, Transport } from "@nestjs/microservices";
+import { ConfigService }                              from "@nestjs/config";
+import { Observable }                                 from "rxjs";
+import { ApiResponse }                    from "@nestjs/swagger";
+import { CategoryDto, CreateCategoryDto } from "models";
 
 @Controller()
 export class AppController {
@@ -27,13 +28,14 @@ export class AppController {
 
 
   @Post("categories")
-  createCategory(@Body() createCategoryDto: CreateCategoryDto) {
+  createCategory(@Body() createCategoryDto: CreateCategoryDto): Observable<CategoryDto> {
     return this.clientAdminBackend.emit("create-category", createCategoryDto);
   }
 
   @Get("categories")
-  listCategories() {
-    return this.clientAdminBackend.send("list-category", null);
+  @ApiResponse({ isArray: true, type: CategoryDto})
+  listCategories(): Observable<CategoryDto[]> {
+    return this.clientAdminBackend.send<CategoryDto[], {}>("list-category", {});
   }
 
 
