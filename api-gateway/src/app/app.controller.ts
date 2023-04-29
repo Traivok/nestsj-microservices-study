@@ -1,8 +1,8 @@
-import { Body, Controller, Get, Logger, Post, UsePipes, ValidationPipe } from "@nestjs/common";
-import { ClientProxy, ClientProxyFactory, Transport }                    from "@nestjs/microservices";
-import { ConfigService }     from "@nestjs/config";
-import { CreateCategoryDto } from "../../../dtos/create-category.dto";
-import { ApiResponse }       from "@nestjs/swagger";
+import { Body, Controller, Get, Logger, Param, Post, UsePipes, ValidationPipe } from "@nestjs/common";
+import { ClientProxy, ClientProxyFactory, Transport }                           from "@nestjs/microservices";
+import { ConfigService }                                                        from "@nestjs/config";
+import { Observable }                     from "rxjs";
+import { CategoryDto, CreateCategoryDto } from "dtos";
 
 @Controller()
 export class AppController {
@@ -16,11 +16,11 @@ export class AppController {
     this.clientAdminBackend = ClientProxyFactory.create({
       transport: Transport.RMQ,
       options:   {
-        urls:  [ rmqUrl ],
-        queue: "admin-backend",
+        urls:         [ rmqUrl ],
+        queue:        "admin-backend",
         queueOptions: {
           durable: false
-        },
+        }
       }
     });
   }
@@ -29,6 +29,16 @@ export class AppController {
   @Post("categories")
   createCategory(@Body() createCategoryDto: CreateCategoryDto) {
     return this.clientAdminBackend.emit("create-category", createCategoryDto);
+  }
 
+  @Get("categories")
+  listCategories() {
+    return this.clientAdminBackend.send("list-category", null);
+  }
+
+
+  @Get("categories/:id")
+  getCategory(@Param("id") id: string): Observable<CategoryDto> {
+    return this.clientAdminBackend.send("get-category", id);
   }
 }

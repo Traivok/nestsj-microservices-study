@@ -5,17 +5,17 @@ import { ApiProperty }                                                 from "@ne
 export class CreateCategoryDto {
   @IsString()
   @IsNotEmpty()
-  readonly category: string;
+  readonly category!: string;
 
 
   @IsString()
   @IsNotEmpty()
-  description: string;
+  description!: string;
 
   @ApiProperty({ isArray: true, type: EventDto })
   @IsArray()
   @ArrayMinSize(1)
-  events: Array<EventDto>
+  events!: Array<EventDto>
 }
 
 

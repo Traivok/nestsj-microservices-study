@@ -2,7 +2,7 @@ import { Controller, Get, Logger } from "@nestjs/common";
 
 import { AppService }            from './app.service';
 import { EventPattern, Payload } from "@nestjs/microservices";
-import { CreateCategoryDto }     from "../../../dtos/create-category.dto";
+import { CreateCategoryDto }     from "../../../dtos/src/lib/create-category.dto";
 
 @Controller()
 export class AppController {

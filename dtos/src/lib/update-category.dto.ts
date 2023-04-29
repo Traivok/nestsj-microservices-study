@@ -5,9 +5,9 @@ export class UpdateCategoryDto {
   @IsOptional()
   @IsString()
   @IsNotEmpty()
-  description: string;
+  description!: string;
 
   @IsArray()
   @ArrayMinSize(1)
-  events: Array<EventDto>
+  events!: Array<EventDto>
 }
