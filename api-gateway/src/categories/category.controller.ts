@@ -40,7 +40,7 @@ export class CategoryController {
 
   @Delete(":id")
   deleteCategory(@Param("id") id: string): Observable<void> {
-    return this.clientAdminBackend.send("delete-category", id);
+    return this.clientAdminBackend.emit("delete-category", id);
   }
 
 }

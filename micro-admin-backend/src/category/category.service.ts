@@ -23,10 +23,10 @@ export class CategoryService {
   }
 
   async delete(id: string): Promise<void> {
-    this.categoryModel.findByIdAndDelete(id);
+    await this.categoryModel.findByIdAndDelete(id);
   }
 
   async update(id: string, dto: UpdateCategoryDto): Promise<CategoryDto> {
-    return this.categoryModel.findByIdAndUpdate(id, dto);
+    return this.categoryModel.findByIdAndUpdate(id, dto, { new: true });
   }
 }

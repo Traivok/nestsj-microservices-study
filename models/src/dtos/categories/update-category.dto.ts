@@ -7,6 +7,7 @@ export class UpdateCategoryDto {
   @IsNotEmpty()
   description!: string;
 
+  @IsOptional()
   @IsArray()
   @ArrayMinSize(1)
   events!: Array<EventDto>
