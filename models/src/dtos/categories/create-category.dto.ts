@@ -1,5 +1,5 @@
 import { ArrayMinSize, IsArray, IsNotEmpty, IsString, ValidateNested } from "class-validator";
-import { EventDto }                                                    from "./event.dto";
+import { EventDto }                                                    from "../event.dto";
 import { ApiProperty }                                                 from "@nestjs/swagger";
 
 export class CreateCategoryDto {

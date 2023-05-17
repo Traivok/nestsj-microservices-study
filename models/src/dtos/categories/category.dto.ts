@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { EventDto }    from "./event.dto";
+import { EventDto }    from "../event.dto";
 
 export class CategoryDto {
   readonly category!: string;

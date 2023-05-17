@@ -6,10 +6,10 @@ import { RmqOptions, Transport } from "@nestjs/microservices";
 import { ConfigService }         from "@nestjs/config";
 
 async function bootstrap() {
-  const appContext           = await NestFactory.createApplicationContext(AppModule);
+  const appContext    = await NestFactory.createApplicationContext(AppModule);
   const configService = appContext.get<ConfigService>(ConfigService);
 
-  const app  = await NestFactory.createMicroservice<RmqOptions>(AppModule, {
+  const app = await NestFactory.createMicroservice<RmqOptions>(AppModule, {
     transport: Transport.RMQ,
     options:   {
       urls:         [ configService.getOrThrow<string>("RMQ_URL") ],

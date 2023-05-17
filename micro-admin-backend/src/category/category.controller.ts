@@ -1,9 +1,9 @@
-import { Controller, Logger } from "@nestjs/common";
-import { CategoryDto, CreateCategoryDto } from "models";
-import { CategoryService }                from "./category.service";
-import { EventPattern, Payload } from "@nestjs/microservices";
+import { Controller, Logger }                                from "@nestjs/common";
+import { CategoryDto, CreateCategoryDto, UpdateCategoryDto } from "models";
+import { CategoryService }                                   from "./category.service";
+import { EventPattern, Payload }                             from "@nestjs/microservices";
 
-@Controller('')
+@Controller("")
 export class CategoryController {
   private readonly logger = new Logger(CategoryController.name);
 
@@ -16,11 +16,22 @@ export class CategoryController {
 
   @EventPattern("list-category")
   async listCategory(): Promise<CategoryDto[]> {
+    this.logger.log('listing')
     return await this.categoryService.list();
   }
 
   @EventPattern("get-category")
-  async getCategory(@Payload() _id: string): Promise<CategoryDto> {
-    return await this.categoryService.get(_id);
+  async getCategory(@Payload() id: string): Promise<CategoryDto> {
+    return await this.categoryService.get(id);
+  }
+
+  @EventPattern("update-category")
+  async updateCategory(@Payload() payload: { id: string, data: UpdateCategoryDto }): Promise<CategoryDto> {
+    return await this.categoryService.update(payload.id, payload.data);
+  }
+
+  @EventPattern("delete-category")
+  async deleteCategory(@Payload() id: string): Promise<void> {
+    await this.categoryService.delete(id);
   }
 }

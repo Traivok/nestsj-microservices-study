@@ -1,5 +1,5 @@
 import { ArrayMinSize, IsArray, IsNotEmpty, IsOptional, IsString } from "class-validator";
-import { EventDto }                                                from "./event.dto";
+import { EventDto }                                                from "../event.dto";
 
 export class UpdateCategoryDto {
   @IsOptional()

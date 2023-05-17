@@ -12,10 +12,11 @@ export class ClientProxyService {
       transport: Transport.RMQ,
       options:   {
         urls:  [ this.config.getOrThrow<string>("RMQ_URL") ],
-        queue: "admin-backend"
+        queue: "admin-backend",
+        queueOptions: {
+          durable: false,
+        }
       }
     });
-
-
   }
 }

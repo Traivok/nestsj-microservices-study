@@ -5,7 +5,7 @@ import { ApiResponse, ApiTags } from "@nestjs/swagger";
 import { ClientProxyService }   from "../proxyrmq/client-proxy.service";
 import { ClientProxy }                                       from "@nestjs/microservices";
 
-@Controller('category')
+@Controller('categories')
 @ApiTags('category')
 export class CategoryController {
   private readonly logger = new Logger(CategoryController.name);
@@ -15,29 +15,30 @@ export class CategoryController {
     this.clientAdminBackend = this.clientProxyService.getClientProxyAdminBackendInstance();
   }
 
-  @Post("categories")
+  @Post()
   createCategory(@Body() createCategoryDto: CreateCategoryDto): Observable<CategoryDto> {
     return this.clientAdminBackend.send("create-category", createCategoryDto);
   }
 
-  @Get("categories")
+  @Get()
   @ApiResponse({ isArray: true, type: CategoryDto })
   listCategories(): Observable<CategoryDto[]> {
+    this.logger.log('listing')
     return this.clientAdminBackend.send<CategoryDto[], Record<string, never>>("list-category", {});
   }
 
-  @Get("categories/:id")
+  @Get(":id")
   getCategory(@Param("id") id: string): Observable<CategoryDto> {
     return this.clientAdminBackend.send("get-category", id);
   }
 
-  @Patch("categories/:id")
+  @Patch(":id")
   updateCategory(@Param("id") id: string,
                  @Body() dto: UpdateCategoryDto): Observable<CategoryDto> {
     return this.clientAdminBackend.send("update-category", { id, data: dto });
   }
 
-  @Delete("categories/:id")
+  @Delete(":id")
   deleteCategory(@Param("id") id: string): Observable<void> {
     return this.clientAdminBackend.send("delete-category", id);
   }

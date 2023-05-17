@@ -7,12 +7,12 @@ import { CategoryModule }              from "../category/category.module";
 @Module({
   imports:     [
     ConfigModule.forRoot({
-      expandVariables: true,
+      expandVariables: true
     }),
     MongooseModule.forRootAsync({
       imports:    [ ConfigModule ],
       useFactory: async (configService: ConfigService) => ( {
-        uri: configService.getOrThrow<string>("MONGODB_URL"),
+        uri:             configService.getOrThrow<string>("MONGODB_URL"),
       } ),
       inject:     [ ConfigService ]
     }),
