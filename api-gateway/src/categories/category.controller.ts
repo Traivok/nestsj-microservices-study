@@ -1,31 +1,19 @@
 import { Body, Controller, Delete, Get, Logger, Param, Patch, Post } from "@nestjs/common";
-import { ClientProxy, ClientProxyFactory, Transport }                from "@nestjs/microservices";
-import { ConfigService }                                     from "@nestjs/config";
-import { Observable }                                        from "rxjs";
-import { ApiResponse }                                       from "@nestjs/swagger";
-import { CategoryDto, CreateCategoryDto, UpdateCategoryDto } from "models";
+import { CategoryDto, CreateCategoryDto, UpdateCategoryDto }         from "models";
+import { Observable }           from "rxjs";
+import { ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ClientProxyService }   from "../proxyrmq/client-proxy.service";
+import { ClientProxy }                                       from "@nestjs/microservices";
 
-@Controller()
-export class AppController {
-  private readonly logger = new Logger(AppController.name);
+@Controller('category')
+@ApiTags('category')
+export class CategoryController {
+  private readonly logger = new Logger(CategoryController.name);
+  private readonly clientAdminBackend: ClientProxy
 
-  private clientAdminBackend: ClientProxy;
-
-  constructor(private readonly config: ConfigService) {
-    const rmqUrl = this.config.getOrThrow("RMQ_URL");
-    this.logger.log(rmqUrl);
-    this.clientAdminBackend = ClientProxyFactory.create({
-      transport: Transport.RMQ,
-      options:   {
-        urls:         [ rmqUrl ],
-        queue:        "admin-backend",
-        queueOptions: {
-          durable: false
-        }
-      }
-    });
+  constructor(private readonly clientProxyService: ClientProxyService) {
+    this.clientAdminBackend = this.clientProxyService.getClientProxyAdminBackendInstance();
   }
-
 
   @Post("categories")
   createCategory(@Body() createCategoryDto: CreateCategoryDto): Observable<CategoryDto> {
@@ -37,7 +25,6 @@ export class AppController {
   listCategories(): Observable<CategoryDto[]> {
     return this.clientAdminBackend.send<CategoryDto[], Record<string, never>>("list-category", {});
   }
-
 
   @Get("categories/:id")
   getCategory(@Param("id") id: string): Observable<CategoryDto> {
@@ -54,4 +41,5 @@ export class AppController {
   deleteCategory(@Param("id") id: string): Observable<void> {
     return this.clientAdminBackend.send("delete-category", id);
   }
+
 }
