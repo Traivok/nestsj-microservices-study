@@ -7,7 +7,6 @@ export class ClientProxyService {
   constructor(private readonly config: ConfigService) {}
 
   getClientProxyAdminBackendInstance(): ClientProxy {
-
     return ClientProxyFactory.create({
       transport: Transport.RMQ,
       options:   {

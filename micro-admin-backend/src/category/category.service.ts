@@ -29,4 +29,8 @@ export class CategoryService {
   async update(id: string, dto: UpdateCategoryDto): Promise<CategoryDto> {
     return this.categoryModel.findByIdAndUpdate(id, dto, { new: true });
   }
+
+  public async findByCategory(category: string): Promise<CategoryDto> {
+    return this.categoryModel.findOne({ category });
+  }
 }

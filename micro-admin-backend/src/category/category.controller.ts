@@ -1,7 +1,7 @@
 import { Controller, Logger }                                from "@nestjs/common";
 import { CategoryDto, CreateCategoryDto, UpdateCategoryDto } from "models";
-import { CategoryService }                                   from "./category.service";
-import { EventPattern, Payload }                             from "@nestjs/microservices";
+import { CategoryService }                       from "./category.service";
+import { EventPattern, Payload } from "@nestjs/microservices";
 
 @Controller("")
 export class CategoryController {
@@ -16,8 +16,12 @@ export class CategoryController {
 
   @EventPattern("list-category")
   async listCategory(): Promise<CategoryDto[]> {
-    this.logger.log('listing')
     return await this.categoryService.list();
+  }
+
+  @EventPattern("find-category")
+  async findCategory(@Payload() category: string): Promise<CategoryDto> {
+    return await this.categoryService.findByCategory(category);
   }
 
   @EventPattern("get-category")

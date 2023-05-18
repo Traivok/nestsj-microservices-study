@@ -1,9 +1,8 @@
-import { Logger, ValidationPipe } from "@nestjs/common";
-import { NestFactory }            from "@nestjs/core";
+import { ClassSerializerInterceptor, Logger, ValidationPipe } from "@nestjs/common";
+import { NestFactory, Reflector }                             from "@nestjs/core";
 
 import { AppModule }                      from "./app/app.module";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
-import { AllExceptionsFilter }            from "./app/filters/all-exceptions.filter";
 import { TimeoutInterceptor }             from "./app/interceptors/timeout.interceptor";
 
 async function bootstrap() {
@@ -12,7 +11,13 @@ async function bootstrap() {
   const globalPrefix = "api/v1";
   app.setGlobalPrefix(globalPrefix);
 
-  app.useGlobalInterceptors(new TimeoutInterceptor());
+  app.useGlobalInterceptors(new TimeoutInterceptor(),
+    new ClassSerializerInterceptor(app.get(Reflector),
+      {
+        excludeExtraneousValues: this,
+        excludePrefixes: ['_'],
+      }),
+    );
   // app.useGlobalFilters(new AllExceptionsFilter());
   app.useGlobalPipes(new ValidationPipe());
 

@@ -1,15 +1,17 @@
-import { Body, Controller, Delete, Get, Logger, Param, Patch, Post } from "@nestjs/common";
-import { CategoryDto, CreateCategoryDto, UpdateCategoryDto }         from "models";
-import { Observable }           from "rxjs";
-import { ApiResponse, ApiTags } from "@nestjs/swagger";
-import { ClientProxyService }   from "../proxyrmq/client-proxy.service";
-import { ClientProxy }                                       from "@nestjs/microservices";
+import { Body, Controller, Delete, Get, HttpStatus, Logger, Param, Patch, Post } from "@nestjs/common";
+import { CategoryDto, CreateCategoryDto, UpdateCategoryDto }                     from "models";
+import { Observable }                                                            from "rxjs";
+import { ApiResponse, ApiTags }                                                  from "@nestjs/swagger";
+import {
+  ClientProxyService
+}                                                                                from "../proxyrmq/client-proxy.service";
+import { ClientProxy }                                                           from "@nestjs/microservices";
 
-@Controller('categories')
-@ApiTags('category')
+@Controller("categories")
+@ApiTags("category")
 export class CategoryController {
   private readonly logger = new Logger(CategoryController.name);
-  private readonly clientAdminBackend: ClientProxy
+  private readonly clientAdminBackend: ClientProxy;
 
   constructor(private readonly clientProxyService: ClientProxyService) {
     this.clientAdminBackend = this.clientProxyService.getClientProxyAdminBackendInstance();
@@ -21,9 +23,9 @@ export class CategoryController {
   }
 
   @Get()
-  @ApiResponse({ isArray: true, type: CategoryDto })
+  @ApiResponse({ status: HttpStatus.OK, isArray: true, type: CategoryDto })
   listCategories(): Observable<CategoryDto[]> {
-    this.logger.log('listing')
+    this.logger.log("listing");
     return this.clientAdminBackend.send<CategoryDto[], Record<string, never>>("list-category", {});
   }
 
