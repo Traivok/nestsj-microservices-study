@@ -32,7 +32,7 @@ export class PlayersController {
 
   constructor(private readonly clientProxyService: ClientProxyService,
               private readonly playerPicService: PlayerPictureService) {
-    this.clientAdminBackend = this.clientProxyService.getClientProxyAdminBackendInstance();
+    this.clientAdminBackend = this.clientProxyService.createClientProxyAdminBackend();
   }
 
   @Post()

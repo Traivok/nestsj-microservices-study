@@ -1,9 +1,8 @@
-import { Module }                      from "@nestjs/common";
-import { PlayerPictureService } from './player-picture.service';
-import { ProxyRMQModule }              from "../proxyrmq/proxy-rmq.module";
-import { PlayersController }           from "./players.controller";
-import { HttpModule }                  from "@nestjs/axios";
-import { ConfigService }               from "@nestjs/config";
+import { Module }               from "@nestjs/common";
+import { PlayerPictureService } from "./player-picture.service";
+import { ProxyRMQModule }       from "../proxyrmq/proxy-rmq.module";
+import { PlayersController }    from "./players.controller";
+import { HttpModule }           from "@nestjs/axios";
 
 @Module({
   imports:     [

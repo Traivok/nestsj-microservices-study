@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { HydratedDocument }            from "mongoose";
-import { Player }                      from "../../../micro-admin-backend/src/players/player.schema";
-import { Category }                    from "../../../micro-admin-backend/src/category/category.schema";
+import mongoose, { HydratedDocument }  from "mongoose";
+import { ResultDto }                   from "models";
 
 export type MatchDocument = HydratedDocument<Match>;
 
@@ -13,25 +12,12 @@ export type MatchDocument = HydratedDocument<Match>;
   toJSON:     { virtuals: true }
 })
 export class Match {
-  // @Prop()
-  // categoria: string;
-
-  // @Prop()
-  // desafio: string;
-
-  // @Prop()
-  // jogadores: string[];
-
-  @Prop()
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "Player" })
   def: string;
 
   @Prop([ { set: String } ])
-  results: Array<Result>;
-}
-
-export interface Result {
-  set: string;
+  results: Array<ResultDto>;
 }
 
 
-export const MatchMatch = SchemaFactory.createForClass(Match);
+export const MatchSchema = SchemaFactory.createForClass(Match);

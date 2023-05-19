@@ -14,7 +14,7 @@ export class CategoryController {
   private readonly clientAdminBackend: ClientProxy;
 
   constructor(private readonly clientProxyService: ClientProxyService) {
-    this.clientAdminBackend = this.clientProxyService.getClientProxyAdminBackendInstance();
+    this.clientAdminBackend = this.clientProxyService.createClientProxyAdminBackend();
   }
 
   @Post()
