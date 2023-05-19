@@ -1,21 +1,22 @@
-import { Injectable, Logger }                          from "@nestjs/common";
-import { InjectModel }                                 from "@nestjs/mongoose";
-import { Model }                                                    from "mongoose";
-import { CategoryDto, CreatePlayerDto, PlayerDto, UpdatePlayerDto } from "models";
-import { RpcException }                                             from "@nestjs/microservices";
+import { Injectable, Logger }                                                         from "@nestjs/common";
+import { InjectModel }                                                                from "@nestjs/mongoose";
+import { Model }                                                                      from "mongoose";
+import { CategoryDto, CreatePlayerDto, PlayerDto, PlayerPictureDto, UpdatePlayerDto } from "models";
+import { RpcException }                                                               from "@nestjs/microservices";
 
 @Injectable()
 export class PlayersService {
   private readonly logger = new Logger(PlayersService.name);
 
   constructor(
-    @InjectModel("Player") private readonly playerModel: Model<PlayerDto>
+    @InjectModel("Player") private readonly playerModel: Model<PlayerDto>,
+    @InjectModel("PlayerPicture") private readonly pictureModel: Model<PlayerPictureDto>
   ) {}
 
 
   async createPlayer(player: CreatePlayerDto, category: CategoryDto): Promise<PlayerDto> {
     try {
-      const newPlayer = new this.playerModel({ ...player, category});
+      const newPlayer = new this.playerModel({ ...player, category });
       return await newPlayer.save();
     } catch (error) {
       this.logger.error(`error: ${ JSON.stringify(error.message) }`);
@@ -41,9 +42,10 @@ export class PlayersService {
     }
   }
 
-  async updatePlayer(_id: string, player: UpdatePlayerDto): Promise<void> {
+  async updatePlayer(_id: string, player: UpdatePlayerDto): Promise<PlayerDto> {
+    this.logger.log(player);
     try {
-      await this.playerModel.findOneAndUpdate({ _id },
+      return await this.playerModel.findOneAndUpdate({ _id },
         player, { new: true }).exec();
     } catch (error) {
       this.logger.error(`error: ${ JSON.stringify(error.message) }`);
@@ -60,4 +62,14 @@ export class PlayersService {
     }
   }
 
+  public async exists(_id: string): Promise<boolean> {
+    return ( await this.playerModel.exists({ _id }) ) !== null;
+  }
+
+  public async uploadPicture(id: string, picture: PlayerPictureDto): Promise<PlayerDto> {
+    this.logger.log(picture);
+    const pic = new this.pictureModel(picture);
+    const newPic = await pic.save();
+    return this.updatePlayer(id, { pictureUrl: newPic.display_url });
+  }
 }

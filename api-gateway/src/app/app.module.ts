@@ -7,13 +7,15 @@ import { PlayersModule }    from "../players/players.module";
 @Module({
   imports:     [
     ConfigModule.forRoot({
+      isGlobal: true,
       expandVariables: true,
+      envFilePath:     [ ".env", ".env.secrets" ]
     }),
     ProxyRMQModule,
     CategoriesModule,
-    PlayersModule,
+    PlayersModule
   ],
-  controllers: [  ],
+  controllers: [],
   providers:   []
 })
 export class AppModule {}

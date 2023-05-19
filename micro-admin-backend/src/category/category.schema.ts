@@ -19,7 +19,7 @@ export class Category {
 
   @Prop([
     {
-      name:      Number,
+      name:      String,
       operation: String,
       value:     Number
     }

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -8,14 +9,20 @@ import {
   NotFoundException,
   Param,
   Post,
+  Put,
+  UploadedFile,
+  UseInterceptors,
   UsePipes,
   ValidationPipe
-}                                     from "@nestjs/common";
-import { ClientProxy }                from "@nestjs/microservices";
-import { ClientProxyService }         from "../proxyrmq/client-proxy.service";
-import { Observable, switchMap }      from "rxjs";
-import { CreatePlayerDto, PlayerDto } from "models";
-import { ApiResponse, ApiTags }       from "@nestjs/swagger";
+}                                                     from "@nestjs/common";
+import { ClientProxy }                                from "@nestjs/microservices";
+import { ClientProxyService }                         from "../proxyrmq/client-proxy.service";
+import { Observable, switchMap }                      from "rxjs";
+import { CreatePlayerDto, PlayerDto }                 from "models";
+import { ApiBody, ApiConsumes, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { FileInterceptor }                            from "@nestjs/platform-express";
+import { Express }                                    from "express";
+import { PlayerPictureService }                       from "./player-picture.service";
 
 @Controller("players")
 @ApiTags("player")
@@ -23,7 +30,8 @@ export class PlayersController {
   private readonly logger = new Logger(PlayersController.name);
   private readonly clientAdminBackend: ClientProxy;
 
-  constructor(private readonly clientProxyService: ClientProxyService) {
+  constructor(private readonly clientProxyService: ClientProxyService,
+              private readonly playerPicService: PlayerPictureService) {
     this.clientAdminBackend = this.clientProxyService.getClientProxyAdminBackendInstance();
   }
 
@@ -50,29 +58,49 @@ export class PlayersController {
   }
 
   @Get(":id")
-  getPlayer(@Param("id") _id: string): Observable<PlayerDto> {
-    return this.clientAdminBackend.send("get-player", _id);
+  getPlayer(@Param("id") id: string): Observable<PlayerDto> {
+    return this.clientAdminBackend.send("get-player", id);
   }
-
-  // @Put(":id")
-  // @UsePipes(ValidationPipe)
-  // updatePlayer(
-  //   @Body() updatePlayerDto: UpdatePlayerDto,
-  //   @Param("id") _id: string): Promise<PlayerDto> {
-  //
-  //   // const category = await this.clientAdminBackend.send("list-category",
-  //   //   updatePlayerDto.category).toPromise();
-  //
-  //   if (category) {
-  //     return await this.clientAdminBackend.send("update-player", { id: _id, player: updatePlayerDto });
-  //   } else {
-  //     throw new BadRequestException(``);
-  //   }
-  // }
 
   @Delete(":id")
   deletePlayer(
     @Param("id") _id: string) {
     this.clientAdminBackend.emit("delete-player", { _id });
   }
+
+  @Put(":id/picture")
+  @UseInterceptors(FileInterceptor("file"))
+  @ApiConsumes("multipart/form-data")
+  @ApiBody({
+    schema: {
+      type:       "object",
+      properties: {
+        file: {
+          type:   "string",
+          format: "binary"
+        }
+      }
+    }
+  })
+  uploadPlayerPicture(
+    @Param("id") id: string,
+    @UploadedFile() file: Express.Multer.File): Observable<PlayerDto> {
+
+    if (!file.mimetype.startsWith("image"))
+      throw new BadRequestException("Picture should be an image");
+
+    return this.clientAdminBackend.send<boolean>("check-player", id)
+      .pipe(
+        switchMap(exists => {
+          if (!exists)
+            throw new NotFoundException();
+
+          return this.playerPicService.uploadProfilePic(file, id);
+        }),
+        switchMap(picture => {
+          return this.clientAdminBackend.send<PlayerDto>("update_pic-player", { picture, id });
+        })
+      );
+  }
+
 }

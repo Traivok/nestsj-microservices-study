@@ -1,7 +1,7 @@
 import { Controller, Logger }                                       from "@nestjs/common";
 import { PlayersService }                                           from "./players.service";
-import { EventPattern, Payload }                                    from "@nestjs/microservices";
-import { CategoryDto, CreatePlayerDto, PlayerDto, UpdatePlayerDto } from "models";
+import { EventPattern, Payload }                                                      from "@nestjs/microservices";
+import { CategoryDto, CreatePlayerDto, PlayerDto, PlayerPictureDto, UpdatePlayerDto } from "models";
 
 @Controller("players")
 export class PlayersController {
@@ -26,7 +26,17 @@ export class PlayersController {
 
   @EventPattern("update-player")
   async updatePlayer(@Payload() data: { id: string, player: UpdatePlayerDto }) {
-    await this.playerService.updatePlayer(data.id, data.player);
+    return await this.playerService.updatePlayer(data.id, data.player);
+  }
+
+  @EventPattern("check-player")
+  async playerExists(@Payload() _id: string): Promise<boolean> {
+    return await this.playerService.exists(_id);
+  }
+
+  @EventPattern("update_pic-player")
+  async updatePlayerPicture(@Payload() payload: { id: string, picture: PlayerPictureDto }): Promise<PlayerDto> {
+    return await this.playerService.uploadPicture(payload.id, payload.picture);
   }
 
   @EventPattern("delete-player")

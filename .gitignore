@@ -35,3 +35,4 @@ CHANGELOG.md
 
 
 *.node
+.env.secrets
