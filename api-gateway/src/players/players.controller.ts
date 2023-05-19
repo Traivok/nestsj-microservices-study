@@ -89,6 +89,7 @@ export class PlayersController {
     if (!file.mimetype.startsWith("image"))
       throw new BadRequestException("Picture should be an image");
 
+    // TODO retrieve player and delete old pic
     return this.clientAdminBackend.send<boolean>("check-player", id)
       .pipe(
         switchMap(exists => {

@@ -16,6 +16,7 @@
     "baseUrl": ".",
     "paths": {
       "dtos": ["dtos/src/index.ts"],
+      "micro-commons": ["micro-commons/src/index.ts"],
       "models": ["models/src/index.ts"]
     }
   },

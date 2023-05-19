@@ -67,7 +67,7 @@ export class PlayersService {
   }
 
   public async uploadPicture(id: string, picture: PlayerPictureDto): Promise<PlayerDto> {
-    this.logger.log(picture);
+    // TODO delete old pics
     const pic = new this.pictureModel(picture);
     const newPic = await pic.save();
     return this.updatePlayer(id, { pictureUrl: newPic.display_url });
