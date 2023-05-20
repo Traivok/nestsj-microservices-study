@@ -1,5 +1,6 @@
 import { Module }               from "@nestjs/common";
 import { ChallengesController } from "./challenges.controller";
+import { ChallengesService } from './challenges.service';
 import { MatchesController }    from "./matches.controller";
 import { ProxyRMQModule }       from "../proxyrmq/proxy-rmq.module";
 
@@ -7,6 +8,7 @@ import { ProxyRMQModule }       from "../proxyrmq/proxy-rmq.module";
   imports:     [
     ProxyRMQModule
   ],
-  controllers: [ ChallengesController, MatchesController ]
+  controllers: [ ChallengesController, MatchesController ],
+  providers: [ChallengesService]
 })
 export class ChallengesModule {}

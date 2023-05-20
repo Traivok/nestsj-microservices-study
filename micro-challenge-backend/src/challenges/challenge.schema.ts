@@ -21,7 +21,8 @@ export class Challenge {
   @Prop({
     type:     String,
     required: true,
-    enum:     ChallengeStatus
+    enum:     ChallengeStatus,
+    default:  ChallengeStatus.PENDING
   })
   status: string;
 

@@ -3,6 +3,7 @@ import { ConfigModule }     from "@nestjs/config";
 import { CategoriesModule } from "../categories/categories.module";
 import { ProxyRMQModule }   from "../proxyrmq/proxy-rmq.module";
 import { PlayersModule }    from "../players/players.module";
+import { ChallengesModule } from "../challenges/challenges.module";
 
 @Module({
   imports:     [
@@ -13,7 +14,8 @@ import { PlayersModule }    from "../players/players.module";
     }),
     ProxyRMQModule,
     CategoriesModule,
-    PlayersModule
+    PlayersModule,
+    ChallengesModule,
   ],
   controllers: [],
   providers:   []

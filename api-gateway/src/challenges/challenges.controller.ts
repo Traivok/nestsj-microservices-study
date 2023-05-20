@@ -1,57 +1,71 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
   HttpStatus,
   Logger,
-  NotImplementedException,
+  NotFoundException,
   Param,
   Patch,
-  Post
-} from "@nestjs/common";
-import { ClientProxy }                                                           from "@nestjs/microservices";
-import { ApiResponse, ApiTags }                                                  from "@nestjs/swagger";
+  Post,
+  Query
+}                                                                                from "@nestjs/common";
+import { ApiQuery, ApiResponse, ApiTags }                                        from "@nestjs/swagger";
 import {
   ClientProxyService
-}                                                                     from "../proxyrmq/client-proxy.service";
-import { ChallengeDto, CreateChallengeDto, UpdateChallengeStatusDto } from "models";
-import { Observable }                                                 from "rxjs";
+}                                                                                from "../proxyrmq/client-proxy.service";
+import { ChallengeDto, CreateChallengeDto, PlayerDto, UpdateChallengeStatusDto } from "models";
+import { combineLatest, Observable, switchMap }                                  from "rxjs";
 
 @Controller("challenges")
 @ApiTags("challenges")
 export class ChallengesController {
   private readonly logger = new Logger(ChallengesController.name);
-  private readonly clientChallengeBackend: ClientProxy;
 
-  constructor(private readonly clientProxyService: ClientProxyService) {
-    this.clientChallengeBackend = this.clientProxyService.createClientProxyChallengeBackend();
+  constructor(private readonly clientProxies: ClientProxyService) {
   }
 
   @Post()
-  createChallenge(@Body() createChallengeDto: CreateChallengeDto): Observable<ChallengeDto> {
-    throw new NotImplementedException()
+  createChallenge(@Body() dto: CreateChallengeDto): Observable<ChallengeDto> {
+    const challenger$ = this.clientProxies.adminClient.send<PlayerDto>("get-player", dto.challenger);
+    const challenged$ = this.clientProxies.adminClient.send<PlayerDto>("get-player", dto.challenged);
+
+    return combineLatest([ challenger$, challenged$ ])
+      .pipe(switchMap(([ challenger, challenged ]) => {
+        if (!challenger || !challenged)
+          throw  new NotFoundException("Player not found");
+
+        if (challenger === challenged)
+          throw new BadRequestException("Challenger and Challenged should be distinct");
+
+        if (challenger.category?.id !== challenged.category?.id || challenger.category?.id !== dto.category)
+          throw new BadRequestException("Categories does not match");
+
+        return this.clientProxies.challengeClient.send<ChallengeDto, CreateChallengeDto>("create-challenge", dto);
+      }));
   }
 
   @Get()
   @ApiResponse({ status: HttpStatus.OK, isArray: true, type: ChallengeDto })
-  listChallenges(): Observable<ChallengeDto[]> {
-    throw new NotImplementedException()
-  }
+  @ApiQuery({ name: "playerId", type: "string", required: false })
+  listChallenges(@Query("playerId") playerId?: string): Observable<ChallengeDto[]> {
+    if (playerId && !this.clientProxies.adminClient.send<boolean>("check-player", playerId)) {
+      throw new NotFoundException("Player not found");
+    }
 
-  @Get(":id")
-  getChallenge(@Param("id") id: string): Observable<ChallengeDto> {
-    throw new NotImplementedException()
+    return this.clientProxies.challengeClient.send<ChallengeDto[]>("list-challenge", playerId ?? "");
   }
 
   @Patch(":id")
   updateChallenge(@Param("id") id: string,
-                 @Body() dto: UpdateChallengeStatusDto): Observable<ChallengeDto> {
-    throw new NotImplementedException()
+                  @Body() dto: UpdateChallengeStatusDto): Observable<ChallengeDto> {
+    return this.clientProxies.challengeClient.send<ChallengeDto>("update-challenge", { id, challenge: dto });
   }
 
   @Delete(":id")
   deleteChallenge(@Param("id") id: string): Observable<void> {
-    throw new NotImplementedException()
+     return this.clientProxies.challengeClient.emit("delete-challenge", id);
   }
 }

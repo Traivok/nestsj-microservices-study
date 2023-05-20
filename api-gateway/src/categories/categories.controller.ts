@@ -9,40 +9,37 @@ import { ClientProxy }                                                          
 
 @Controller("categories")
 @ApiTags("category")
-export class CategoryController {
-  private readonly logger = new Logger(CategoryController.name);
-  private readonly clientAdminBackend: ClientProxy;
+export class CategoriesController {
+  private readonly logger = new Logger(CategoriesController.name);
 
-  constructor(private readonly clientProxyService: ClientProxyService) {
-    this.clientAdminBackend = this.clientProxyService.createClientProxyAdminBackend();
-  }
+  constructor(private readonly clientProxies: ClientProxyService) {}
 
   @Post()
   createCategory(@Body() createCategoryDto: CreateCategoryDto): Observable<CategoryDto> {
-    return this.clientAdminBackend.send("create-category", createCategoryDto);
+    return this.clientProxies.adminClient.send("create-category", createCategoryDto);
   }
 
   @Get()
   @ApiResponse({ status: HttpStatus.OK, isArray: true, type: CategoryDto })
   listCategories(): Observable<CategoryDto[]> {
     this.logger.log("listing");
-    return this.clientAdminBackend.send<CategoryDto[], Record<string, never>>("list-category", {});
+    return this.clientProxies.adminClient.send<CategoryDto[], Record<string, never>>("list-category", {});
   }
 
   @Get(":id")
   getCategory(@Param("id") id: string): Observable<CategoryDto> {
-    return this.clientAdminBackend.send("get-category", id);
+    return this.clientProxies.adminClient.send("get-category", id);
   }
 
   @Patch(":id")
   updateCategory(@Param("id") id: string,
                  @Body() dto: UpdateCategoryDto): Observable<CategoryDto> {
-    return this.clientAdminBackend.send("update-category", { id, data: dto });
+    return this.clientProxies.adminClient.send("update-category", { id, data: dto });
   }
 
   @Delete(":id")
   deleteCategory(@Param("id") id: string): Observable<void> {
-    return this.clientAdminBackend.emit("delete-category", id);
+    return this.clientProxies.adminClient.emit("delete-category", id);
   }
 
 }

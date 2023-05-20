@@ -3,7 +3,7 @@ import { CategoryDto, CreateCategoryDto, UpdateCategoryDto } from "models";
 import { CategoryService }                       from "./category.service";
 import { EventPattern, Payload } from "@nestjs/microservices";
 
-@Controller("")
+@Controller()
 export class CategoryController {
   private readonly logger = new Logger(CategoryController.name);
 

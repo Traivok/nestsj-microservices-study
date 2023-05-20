@@ -3,7 +3,7 @@ import { PlayersService }                                           from "./play
 import { EventPattern, Payload }                                                      from "@nestjs/microservices";
 import { CategoryDto, CreatePlayerDto, PlayerDto, PlayerPictureDto, UpdatePlayerDto } from "models";
 
-@Controller("players")
+@Controller()
 export class PlayersController {
   private readonly logger = new Logger(PlayersController.name);
 

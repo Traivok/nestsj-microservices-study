@@ -28,21 +28,19 @@ import { PlayerPictureService }                       from "./player-picture.ser
 @ApiTags("player")
 export class PlayersController {
   private readonly logger = new Logger(PlayersController.name);
-  private readonly clientAdminBackend: ClientProxy;
 
-  constructor(private readonly clientProxyService: ClientProxyService,
+  constructor(private readonly clientProxies: ClientProxyService,
               private readonly playerPicService: PlayerPictureService) {
-    this.clientAdminBackend = this.clientProxyService.createClientProxyAdminBackend();
   }
 
   @Post()
   @UsePipes(ValidationPipe)
   createPlayer(
     @Body() player: CreatePlayerDto): Observable<PlayerDto> {
-    return this.clientAdminBackend.send("find-category", player.category)
+    return this.clientProxies.adminClient.send("find-category", player.category)
       .pipe(switchMap(category => {
           if (category) {
-            return this.clientAdminBackend.send("create-player", { player, category });
+            return this.clientProxies.adminClient.send("create-player", { player, category });
           } else {
             throw new NotFoundException(`Category Not Found`);
           }
@@ -54,18 +52,18 @@ export class PlayersController {
   @Get()
   @ApiResponse({ status: HttpStatus.OK, isArray: true, type: PlayerDto })
   listPlayers(): Observable<PlayerDto[]> {
-    return this.clientAdminBackend.send("list-player", "");
+    return this.clientProxies.adminClient.send("list-player", "");
   }
 
   @Get(":id")
   getPlayer(@Param("id") id: string): Observable<PlayerDto> {
-    return this.clientAdminBackend.send("get-player", id);
+    return this.clientProxies.adminClient.send("get-player", id);
   }
 
   @Delete(":id")
   deletePlayer(
     @Param("id") _id: string) {
-    this.clientAdminBackend.emit("delete-player", { _id });
+    this.clientProxies.adminClient.emit("delete-player", { _id });
   }
 
   @Put(":id/picture")
@@ -90,7 +88,7 @@ export class PlayersController {
       throw new BadRequestException("Picture should be an image");
 
     // TODO retrieve player and delete old pic
-    return this.clientAdminBackend.send<boolean>("check-player", id)
+    return this.clientProxies.adminClient.send<boolean>("check-player", id)
       .pipe(
         switchMap(exists => {
           if (!exists)
@@ -99,7 +97,7 @@ export class PlayersController {
           return this.playerPicService.uploadProfilePic(file, id);
         }),
         switchMap(picture => {
-          return this.clientAdminBackend.send<PlayerDto>("update_pic-player", { picture, id });
+          return this.clientProxies.adminClient.send<PlayerDto>("update_pic-player", { picture, id });
         })
       );
   }

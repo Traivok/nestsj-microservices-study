@@ -4,14 +4,20 @@ import { ClientProxy, ClientProxyFactory, RmqOptions, Transport } from "@nestjs/
 
 @Injectable()
 export class ClientProxyService {
-  constructor(private readonly config: ConfigService) {}
+  private readonly adminBE: ClientProxy;
+  private readonly challengeBE: ClientProxy;
 
-  createClientProxyAdminBackend(): ClientProxy {
-    return this.createInstance("admin-backend");
+  constructor(private readonly config: ConfigService) {
+    this.adminBE = this.createInstance("admin-backend");
+    this.challengeBE = this.createInstance("challenge-backend");
   }
 
-  createClientProxyChallengeBackend(): ClientProxy {
-    return this.createInstance("challenge-backend");
+  get adminClient(): ClientProxy {
+    return this.adminBE;
+  }
+
+  get challengeClient(): ClientProxy {
+    return this.challengeBE;
   }
 
   private createInstance(queue: string, queueOptions: Record<string, unknown> = { durable: false }) {
