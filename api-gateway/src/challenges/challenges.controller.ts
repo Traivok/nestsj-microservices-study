@@ -11,13 +11,13 @@ import {
   Patch,
   Post,
   Query
-}                                                                                from "@nestjs/common";
-import { ApiQuery, ApiResponse, ApiTags }                                        from "@nestjs/swagger";
+}                                                                                             from "@nestjs/common";
+import { ApiQuery, ApiResponse, ApiTags }                                                     from "@nestjs/swagger";
 import {
   ClientProxyService
-}                                                                                from "../proxyrmq/client-proxy.service";
-import { ChallengeDto, CreateChallengeDto, PlayerDto, UpdateChallengeStatusDto } from "models";
-import { combineLatest, Observable, switchMap }                                  from "rxjs";
+}                                                                                             from "../proxyrmq/client-proxy.service";
+import { CategoryDto, ChallengeDto, CreateChallengeDto, PlayerDto, UpdateChallengeStatusDto } from "models";
+import { combineLatest, Observable, switchMap }                                               from "rxjs";
 
 @Controller("challenges")
 @ApiTags("challenges")
@@ -31,19 +31,25 @@ export class ChallengesController {
   createChallenge(@Body() dto: CreateChallengeDto): Observable<ChallengeDto> {
     const challenger$ = this.clientProxies.adminClient.send<PlayerDto>("get-player", dto.challenger);
     const challenged$ = this.clientProxies.adminClient.send<PlayerDto>("get-player", dto.challenged);
+    const category$   = this.clientProxies.adminClient.send<CategoryDto>("find-category", dto.category);
 
-    return combineLatest([ challenger$, challenged$ ])
-      .pipe(switchMap(([ challenger, challenged ]) => {
-        if (!challenger || !challenged)
-          throw  new NotFoundException("Player not found");
+    return combineLatest([ challenger$, challenged$, category$ ])
+      .pipe(switchMap(([ challenger, challenged, category ]) => {
+        if (!challenger || !challenged || !category)
+          throw  new NotFoundException("Player or Category not found");
 
         if (challenger === challenged)
           throw new BadRequestException("Challenger and Challenged should be distinct");
 
-        if (challenger.category?.id !== challenged.category?.id || challenger.category?.id !== dto.category)
+        if (challenger.category?.id !== challenged.category?.id || challenger.category?.id !== category.id)
           throw new BadRequestException("Categories does not match");
 
-        return this.clientProxies.challengeClient.send<ChallengeDto, CreateChallengeDto>("create-challenge", dto);
+        return this.clientProxies.challengeClient.send<ChallengeDto>("create-challenge", {
+          dto,
+          category,
+          challenger,
+          challenged
+        });
       }));
   }
 
@@ -66,6 +72,6 @@ export class ChallengesController {
 
   @Delete(":id")
   deleteChallenge(@Param("id") id: string): Observable<void> {
-     return this.clientProxies.challengeClient.emit("delete-challenge", id);
+    return this.clientProxies.challengeClient.emit("delete-challenge", id);
   }
 }

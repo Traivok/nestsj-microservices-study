@@ -1,7 +1,21 @@
-import { BadRequestException, Controller, Logger, NotFoundException }                  from "@nestjs/common";
-import { ChallengesService }                                                           from "./challenges.service";
-import { EventPattern, Payload }                                                       from "@nestjs/microservices";
-import { ChallengeDto, ChallengeStatus, CreateChallengeDto, UpdateChallengeStatusDto } from "models";
+import { BadRequestException, Controller, Logger, NotFoundException } from "@nestjs/common";
+import { ChallengesService }                                          from "./challenges.service";
+import { EventPattern, Payload }                                      from "@nestjs/microservices";
+import {
+  CategoryDto,
+  ChallengeDto,
+  ChallengeStatus,
+  CreateChallengeDto,
+  PlayerDto,
+  UpdateChallengeStatusDto
+}                                                                     from "models";
+
+interface CreateChallengePayload {
+  dto: CreateChallengeDto,
+  category: CategoryDto,
+  challenger: PlayerDto,
+  challenged: PlayerDto,
+}
 
 @Controller()
 export class ChallengesController {
@@ -10,13 +24,12 @@ export class ChallengesController {
   constructor(private readonly challengeService: ChallengesService) {}
 
   @EventPattern("create-challenge")
-  public async createChallenge(@Payload() dto: CreateChallengeDto): Promise<ChallengeDto> {
-    return this.challengeService.create(dto);
+  public async createChallenge(@Payload() payload: CreateChallengePayload): Promise<ChallengeDto> {
+    return this.challengeService.create(payload.dto, payload.challenger, payload.challenged, payload.category);
   }
 
   @EventPattern("list-challenge")
   public async listChallenge(@Payload() playerId: string): Promise<ChallengeDto[]> {
-    this.logger.log('listing')
     if (typeof playerId === "string" && playerId !== "")
       return this.challengeService.listBy({ playerId });
 
