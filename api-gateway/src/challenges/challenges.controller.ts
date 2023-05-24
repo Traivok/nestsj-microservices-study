@@ -64,6 +64,11 @@ export class ChallengesController {
     return this.clientProxies.challengeClient.send<ChallengeDto[]>("list-challenge", playerId ?? "");
   }
 
+  @Get(":id")
+  getChallenge(@Param("id") id: string): Observable<ChallengeDto> {
+    return this.clientProxies.challengeClient.send<ChallengeDto>("get-challenge", id);
+  }
+
   @Patch(":id")
   updateChallenge(@Param("id") id: string,
                   @Body() dto: UpdateChallengeStatusDto): Observable<ChallengeDto> {

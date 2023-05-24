@@ -1,53 +1,58 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { BadRequestException, Injectable, Logger } from "@nestjs/common";
+import { InjectModel }                             from "@nestjs/mongoose";
+import { FilterQuery, Model, UpdateQuery }         from "mongoose";
 import {
-  InjectModel
-}                             from "@nestjs/mongoose";
-import {
-  FilterQuery,
-  Model, UpdateQuery
-}                             from "mongoose";
-import {
+  AssignChallengeMatchDto,
   CategoryDto,
   ChallengeDto,
   ChallengeStatus,
   CreateChallengeDto,
+  MatchDto,
   PlayerDto,
   UpdateChallengeStatusDto
-}                             from "models";
+}                                                  from "models";
+import { Challenge, ChallengeDocument }            from "./challenge.schema";
+import { MatchDocument }                           from "./match.schema";
 
 @Injectable()
 export class ChallengesService {
   private readonly logger = new Logger(ChallengesService.name);
 
-  constructor(@InjectModel("Challenge") private readonly challengeModel: Model<ChallengeDto>) {}
+  constructor(@InjectModel("Challenge") private readonly challengeModel: Model<ChallengeDocument>,
+              @InjectModel("Match") private readonly matchModel: Model<MatchDocument>) {}
 
-  public async create(challenge: CreateChallengeDto, challenger: PlayerDto, challenged: PlayerDto, category: CategoryDto): Promise<ChallengeDto> {
+  public async create(challenge: CreateChallengeDto, challenger: PlayerDto, challenged: PlayerDto, category: CategoryDto): Promise<ChallengeDocument> {
     const newChallenge = new this.challengeModel({ ...challenge, challenged, challenger, category });
 
     return await newChallenge.save();
   }
 
-  public async list(): Promise<ChallengeDto[]> {
-    return this.challengeModel.find<ChallengeDto>().populate("match").exec();
+  public async list(): Promise<ChallengeDocument[]> {
+    return this.challengeModel.find<ChallengeDocument>().populate("match").exec();
   }
 
-  public async listBy(filter: { playerId: string }): Promise<ChallengeDto[]> {
-    const filterQuery: FilterQuery<ChallengeDto> = {
+  public async listBy(filter: { playerId: string }): Promise<ChallengeDocument[]> {
+    const filterQuery: FilterQuery<ChallengeDocument> = {
       $or: [
         { challenged: filter.playerId },
         { challenger: filter.playerId }
       ]
     };
 
-    return this.challengeModel.find<ChallengeDto>(filterQuery).populate("match").exec();
+    return this.challengeModel.find<ChallengeDocument>(filterQuery).populate("match").exec();
   }
 
-  public async get(id: string): Promise<ChallengeDto> {
-    return this.challengeModel.findById(id).exec();
+  public async get(id: string, populate = false): Promise<ChallengeDocument> {
+    let query = this.challengeModel.findById(id);
+
+    if (populate)
+      query = query.populate([ "challenger", "challenged", "match", "category" ]);
+
+    return query.exec();
   }
 
-  public async update(id: string, challenge: UpdateChallengeStatusDto): Promise<ChallengeDto> {
-    let update: UpdateQuery<ChallengeDto> = challenge;
+  public async update(id: string, challenge: UpdateChallengeStatusDto): Promise<ChallengeDocument> {
+    let update: UpdateQuery<ChallengeDocument> = challenge;
 
     if (challenge.status === ChallengeStatus.ACCEPTED)
       update = { ...update, acceptedDate: new Date() };
@@ -57,5 +62,29 @@ export class ChallengesService {
 
   public async delete(id: string): Promise<void> {
     await this.challengeModel.findByIdAndDelete(id);
+  }
+
+  public async addMatch(challengeId: string, match: AssignChallengeMatchDto): Promise<ChallengeDocument> {
+    const challenge = await this.get(challengeId);
+
+    if (challenge.status === ChallengeStatus.COMPLETED)
+      throw new BadRequestException("Already completed");
+
+    if (challenge.status !== ChallengeStatus.ACCEPTED)
+      throw new BadRequestException("Must be accepted");
+
+    const playersIds = [
+      challenge.challenger.toString(),
+      challenge.challenger.toString()
+    ];
+
+    if (!playersIds.includes(match.winner)) {
+      throw new BadRequestException("Winner not found in challenge");
+    }
+
+    const newMath   = new this.matchModel(match);
+    challenge.match = ( await newMath.save() ).id;
+
+    return await challenge.save();
   }
 }

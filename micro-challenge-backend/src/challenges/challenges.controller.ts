@@ -25,15 +25,22 @@ export class ChallengesController {
 
   @EventPattern("create-challenge")
   public async createChallenge(@Payload() payload: CreateChallengePayload): Promise<ChallengeDto> {
-    return this.challengeService.create(payload.dto, payload.challenger, payload.challenged, payload.category);
+    const challenge = await this.challengeService.create(payload.dto, payload.challenger, payload.challenged, payload.category);
+    return challenge.toJSON();
   }
 
   @EventPattern("list-challenge")
   public async listChallenge(@Payload() playerId: string): Promise<ChallengeDto[]> {
-    if (typeof playerId === "string" && playerId !== "")
-      return this.challengeService.listBy({ playerId });
+    const docs = typeof playerId === "string" && playerId !== "" ?
+                 await this.challengeService.listBy({ playerId }) :
+                 await this.challengeService.list();
 
-    return this.challengeService.list();
+    return docs.map(doc => doc.toJSON());
+  }
+
+  @EventPattern("get-challenge")
+  public async getChallenge(@Payload() id: string): Promise<ChallengeDto> {
+    return ( await this.challengeService.get(id, true) ).toJSON();
   }
 
   @EventPattern("update-challenge")
@@ -41,7 +48,7 @@ export class ChallengesController {
     challenge: UpdateChallengeStatusDto,
     id: string
   }): Promise<ChallengeDto> {
-    const challenge: ChallengeDto = await this.challengeService.get(payload.id);
+    const challenge = await this.challengeService.get(payload.id);
 
     if (challenge === null)
       throw new NotFoundException();
@@ -49,12 +56,12 @@ export class ChallengesController {
     if (challenge.status !== ChallengeStatus.PENDING)
       throw new BadRequestException("Challenge must be pending");
 
-    return this.challengeService.update(payload.id, payload.challenge);
+    return ( await this.challengeService.update(payload.id, payload.challenge) ).toJSON();
   }
 
   @EventPattern("delete-challenge")
   public async deleteChallenge(@Payload() id: string): Promise<void> {
-    const challenge: ChallengeDto = await this.challengeService.get(id);
+    const challenge = await this.challengeService.get(id);
 
     if (challenge === null)
       throw new NotFoundException();

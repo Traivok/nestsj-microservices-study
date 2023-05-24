@@ -27,16 +27,16 @@ export class Challenge {
   status: string;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "Player" })
-  challenger: string;
+  challenger: mongoose.Schema.Types.ObjectId;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "Player" })
-  challenged: string;
+  challenged: mongoose.Schema.Types.ObjectId;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "Category" })
-  category: string;
+  category: mongoose.Schema.Types.ObjectId;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "Match" })
-  match: string;
+  match: mongoose.Schema.Types.ObjectId;
 }
 
 export const ChallengeSchema = SchemaFactory.createForClass(Challenge);

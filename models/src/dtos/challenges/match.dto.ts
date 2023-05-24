@@ -1,7 +1,7 @@
 import { PlayerDto } from "../players";
 
 export class MatchDto {
-  def!: PlayerDto;
+  winner!: PlayerDto;
   results: Array<ResultDto> = [];
 }
 

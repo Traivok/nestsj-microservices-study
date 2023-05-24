@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import mongoose, { HydratedDocument }  from "mongoose";
-import { ResultDto }                   from "models";
+import mongoose, { HydratedDocument } from "mongoose";
+import { ResultDto }                  from "models";
 
 export type MatchDocument = HydratedDocument<Match>;
 
@@ -13,7 +13,7 @@ export type MatchDocument = HydratedDocument<Match>;
 })
 export class Match {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "Player" })
-  def: string;
+  winner: mongoose.Schema.Types.ObjectId;
 
   @Prop([ { set: String } ])
   results: Array<ResultDto>;

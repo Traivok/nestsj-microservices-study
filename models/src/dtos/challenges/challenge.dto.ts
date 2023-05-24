@@ -41,7 +41,7 @@ export class CreateChallengeDto {
 
 export class AssignChallengeMatchDto {
   @IsNotEmpty()
-  def!: PlayerDto;
+  winner!: string;
 
   @IsNotEmpty()
   result!: Array<ResultDto>;
