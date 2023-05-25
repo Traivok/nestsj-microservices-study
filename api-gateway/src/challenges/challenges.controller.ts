@@ -36,9 +36,9 @@ export class ChallengesController {
     return combineLatest([ challenger$, challenged$, category$ ])
       .pipe(switchMap(([ challenger, challenged, category ]) => {
         if (!challenger || !challenged || !category)
-          throw  new NotFoundException("Player or Category not found");
+          throw new NotFoundException("Player or Category not found");
 
-        if (challenger === challenged)
+        if (challenger.id === challenged.id)
           throw new BadRequestException("Challenger and Challenged should be distinct");
 
         if (challenger.category?.id !== challenged.category?.id || challenger.category?.id !== category.id)

@@ -4,7 +4,7 @@ import { NestFactory, Reflector }                             from "@nestjs/core
 import { AppModule }                      from "./app/app.module";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { TimeoutInterceptor }             from "./app/interceptors/timeout.interceptor";
-import { RpcFilter }                      from "./app/filters/rpc.filter";
+import { RpcExceptionsInterceptor } from "./app/interceptors/rpc-exceptions.interceptor";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -18,11 +18,12 @@ async function bootstrap() {
         excludeExtraneousValues: this,
         excludePrefixes: ['_'],
       }),
+    new RpcExceptionsInterceptor()
     );
-  // app.useGlobalFilters(new AllExceptionsFilter());
+
   app.useGlobalPipes(new ValidationPipe());
 
-  app.useGlobalFilters(new RpcFilter());
+  // app.useGlobalFilters(new RpcFilter());
 
   const port = process.env.PORT || 3000;
 
