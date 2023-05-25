@@ -1,15 +1,15 @@
-import { Controller, UseFilters } from "@nestjs/common";
-import { EventPattern, Payload }  from "@nestjs/microservices";
+import { Controller, UseFilters }                from "@nestjs/common";
+import { MessagePattern, Payload }               from "@nestjs/microservices";
 import { AssignChallengeMatchDto, ChallengeDto } from "models";
-import { ChallengesService }  from "./challenges.service";
-import { DuplicateKeyFilter } from "micro-commons";
+import { ChallengesService }                     from "./challenges.service";
+import { DuplicateKeyFilter }                    from "micro-commons";
 
 @Controller()
 @UseFilters(DuplicateKeyFilter)
 export class MatchesController {
   constructor(private readonly challengeService: ChallengesService) {}
 
-  @EventPattern("create-match")
+  @MessagePattern("create-match")
   async createMatch(@Payload() payload: {
     challengeId: string,
     match: AssignChallengeMatchDto

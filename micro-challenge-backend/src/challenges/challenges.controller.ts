@@ -4,6 +4,7 @@ import {
 }                                                                        from "./challenges.service";
 import {
   EventPattern,
+  MessagePattern,
   Payload,
   RpcException
 }                                                                        from "@nestjs/microservices";
@@ -33,13 +34,13 @@ export class ChallengesController {
 
   constructor(private readonly challengeService: ChallengesService) {}
 
-  @EventPattern("create-challenge")
+  @MessagePattern("create-challenge")
   public async createChallenge(@Payload() payload: CreateChallengePayload): Promise<ChallengeDto> {
     const challenge = await this.challengeService.create(payload.dto, payload.challenger, payload.challenged, payload.category);
     return challenge.toJSON();
   }
 
-  @EventPattern("list-challenge")
+  @MessagePattern("list-challenge")
   public async listChallenge(@Payload() playerId: string): Promise<ChallengeDto[]> {
     const docs = typeof playerId === "string" && playerId !== "" ?
                  await this.challengeService.listBy({ playerId }) :
@@ -48,12 +49,12 @@ export class ChallengesController {
     return docs.map(doc => doc.toJSON());
   }
 
-  @EventPattern("get-challenge")
+  @MessagePattern("get-challenge")
   public async getChallenge(@Payload() id: string): Promise<ChallengeDto> {
     return ( await this.challengeService.get(id, true) ).toJSON();
   }
 
-  @EventPattern("update-challenge")
+  @MessagePattern("update-challenge")
   public async updateChallenge(@Payload() payload: {
     challenge: UpdateChallengeStatusDto,
     id: string

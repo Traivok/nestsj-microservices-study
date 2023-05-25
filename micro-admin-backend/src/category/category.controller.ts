@@ -1,7 +1,7 @@
 import { Controller, Logger, UseFilters }                    from "@nestjs/common";
 import { CategoryDto, CreateCategoryDto, UpdateCategoryDto } from "models";
 import { CategoryService }                       from "./category.service";
-import { EventPattern, Payload } from "@nestjs/microservices";
+import { EventPattern, MessagePattern, Payload } from "@nestjs/microservices";
 import { DuplicateKeyFilter }                                from "micro-commons";
 
 @Controller()
@@ -11,27 +11,27 @@ export class CategoryController {
 
   constructor(private readonly categoryService: CategoryService) {}
 
-  @EventPattern("create-category")
+  @MessagePattern("create-category")
   async createCategory(@Payload() createCategory: CreateCategoryDto): Promise<CategoryDto> {
     return await this.categoryService.create(createCategory);
   }
 
-  @EventPattern("list-category")
+  @MessagePattern("list-category")
   async listCategory(): Promise<CategoryDto[]> {
     return await this.categoryService.list();
   }
 
-  @EventPattern("find-category")
+  @MessagePattern("find-category")
   async findCategory(@Payload() category: string): Promise<CategoryDto> {
     return await this.categoryService.findByCategory(category);
   }
 
-  @EventPattern("get-category")
+  @MessagePattern("get-category")
   async getCategory(@Payload() id: string): Promise<CategoryDto> {
     return await this.categoryService.get(id);
   }
 
-  @EventPattern("update-category")
+  @MessagePattern("update-category")
   async updateCategory(@Payload() payload: { id: string, data: UpdateCategoryDto }): Promise<CategoryDto> {
     return await this.categoryService.update(payload.id, payload.data);
   }
