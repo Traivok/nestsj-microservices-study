@@ -1,15 +1,17 @@
-import { Injectable }                                             from "@nestjs/common";
-import { ConfigService }                                          from "@nestjs/config";
-import { ClientProxy, ClientProxyFactory, RmqOptions, Transport } from "@nestjs/microservices";
+import { Injectable }                                 from "@nestjs/common";
+import { ClientProxy, ClientProxyFactory, Transport } from "@nestjs/microservices";
+import { ConfigService }                              from "@nestjs/config";
 
 @Injectable()
-export class ClientProxyService {
+export class ClientProxiesService {
   private readonly adminBE: ClientProxy;
   private readonly challengeBE: ClientProxy;
+  private readonly rankingBE: ClientProxy;
 
   constructor(private readonly config: ConfigService) {
-    this.adminBE = this.createInstance("admin-backend");
+    this.adminBE     = this.createInstance("admin-backend");
     this.challengeBE = this.createInstance("challenge-backend");
+    this.rankingBE   = this.createInstance("ranking-backend");
   }
 
   get adminClient(): ClientProxy {
@@ -18,6 +20,10 @@ export class ClientProxyService {
 
   get challengeClient(): ClientProxy {
     return this.challengeBE;
+  }
+
+  get rankingClient(): ClientProxy {
+    return this.rankingBE;
   }
 
   private createInstance(queue: string, queueOptions: Record<string, unknown> = { durable: false }) {

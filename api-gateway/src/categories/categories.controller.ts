@@ -2,17 +2,14 @@ import { Body, Controller, Delete, Get, HttpStatus, Logger, Param, Patch, Post }
 import { CategoryDto, CreateCategoryDto, UpdateCategoryDto }                     from "models";
 import { Observable }                                                            from "rxjs";
 import { ApiResponse, ApiTags }                                                  from "@nestjs/swagger";
-import {
-  ClientProxyService
-}                                                                                from "../proxyrmq/client-proxy.service";
-import { ClientProxy }                                                           from "@nestjs/microservices";
+import { ClientProxiesService }                                                  from "rmq-proxies";
 
 @Controller("categories")
 @ApiTags("category")
 export class CategoriesController {
   private readonly logger = new Logger(CategoriesController.name);
 
-  constructor(private readonly clientProxies: ClientProxyService) {}
+  constructor(private readonly clientProxies: ClientProxiesService) {}
 
   @Post()
   createCategory(@Body() createCategoryDto: CreateCategoryDto): Observable<CategoryDto> {

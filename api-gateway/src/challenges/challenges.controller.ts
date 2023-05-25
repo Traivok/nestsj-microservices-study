@@ -13,18 +13,16 @@ import {
   Query
 }                                                                                             from "@nestjs/common";
 import { ApiQuery, ApiResponse, ApiTags }                                                     from "@nestjs/swagger";
-import {
-  ClientProxyService
-}                                                                                             from "../proxyrmq/client-proxy.service";
 import { CategoryDto, ChallengeDto, CreateChallengeDto, PlayerDto, UpdateChallengeStatusDto } from "models";
 import { combineLatest, Observable, switchMap }                                               from "rxjs";
+import { ClientProxiesService }                                                               from "rmq-proxies";
 
 @Controller("challenges")
 @ApiTags("challenges")
 export class ChallengesController {
   private readonly logger = new Logger(ChallengesController.name);
 
-  constructor(private readonly clientProxies: ClientProxyService) {
+  constructor(private readonly clientProxies: ClientProxiesService) {
   }
 
   @Post()

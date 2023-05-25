@@ -1,19 +1,18 @@
 import { Injectable, Logger } from "@nestjs/common";
-import FormData                            from "form-data";
-import { map, Observable, switchMap, tap } from "rxjs";
-import { AxiosResponse }                   from "axios";
-import { ClientProxyService } from "../proxyrmq/client-proxy.service";
+import FormData               from "form-data";
+import { map, Observable }    from "rxjs";
 import { HttpService }        from "@nestjs/axios";
 import { ConfigService }      from "@nestjs/config";
-import { Express }          from "express";
-import { PlayerPictureDto } from "models";
+import { Express }            from "express";
+import { PlayerPictureDto }   from "models";
+import { ClientProxiesService } from "rmq-proxies";
 
 @Injectable()
 export class PlayerPictureService {
   private readonly logger = new Logger(PlayerPictureService.name);
   private readonly pictureHostingUrl: string;
 
-  constructor(private readonly clientProxyService: ClientProxyService,
+  constructor(private readonly clientProxies: ClientProxiesService,
               private readonly httpClient: HttpService,
               private readonly config: ConfigService) {
 

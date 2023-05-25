@@ -15,21 +15,20 @@ import {
   UsePipes,
   ValidationPipe
 }                                                     from "@nestjs/common";
-import { ClientProxy }                                from "@nestjs/microservices";
-import { ClientProxyService }                         from "../proxyrmq/client-proxy.service";
 import { Observable, switchMap }                      from "rxjs";
 import { CreatePlayerDto, PlayerDto }                 from "models";
 import { ApiBody, ApiConsumes, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FileInterceptor }                            from "@nestjs/platform-express";
 import { Express }                                    from "express";
 import { PlayerPictureService }                       from "./player-picture.service";
+import { ClientProxiesService }                       from "rmq-proxies";
 
 @Controller("players")
 @ApiTags("player")
 export class PlayersController {
   private readonly logger = new Logger(PlayersController.name);
 
-  constructor(private readonly clientProxies: ClientProxyService,
+  constructor(private readonly clientProxies: ClientProxiesService,
               private readonly playerPicService: PlayerPictureService) {
   }
 

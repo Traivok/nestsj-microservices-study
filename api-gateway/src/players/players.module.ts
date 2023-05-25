@@ -1,15 +1,15 @@
 import { Module }               from "@nestjs/common";
 import { PlayerPictureService } from "./player-picture.service";
-import { ProxyRMQModule }       from "../proxyrmq/proxy-rmq.module";
 import { PlayersController }    from "./players.controller";
 import { HttpModule }           from "@nestjs/axios";
+import { ProxyRMQModule }       from "rmq-proxies";
 
 @Module({
   imports:     [
     ProxyRMQModule,
-    HttpModule,
+    HttpModule
   ],
   controllers: [ PlayersController ],
-  providers: [PlayerPictureService]
+  providers:   [ PlayerPictureService ]
 })
 export class PlayersModule {}
