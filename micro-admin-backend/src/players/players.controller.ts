@@ -1,9 +1,11 @@
-import { Controller, Logger }                                       from "@nestjs/common";
-import { PlayersService }                                           from "./players.service";
+import { Controller, Logger, UseFilters } from "@nestjs/common";
+import { PlayersService }                 from "./players.service";
 import { EventPattern, Payload }                                                      from "@nestjs/microservices";
 import { CategoryDto, CreatePlayerDto, PlayerDto, PlayerPictureDto, UpdatePlayerDto } from "models";
+import { DuplicateKeyFilter } from "micro-commons";
 
 @Controller()
+@UseFilters(DuplicateKeyFilter)
 export class PlayersController {
   private readonly logger = new Logger(PlayersController.name);
 

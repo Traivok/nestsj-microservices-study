@@ -1,6 +1,12 @@
-import { BadRequestException, Controller, Logger, NotFoundException } from "@nestjs/common";
-import { ChallengesService }                                          from "./challenges.service";
-import { EventPattern, Payload }                                      from "@nestjs/microservices";
+import { Controller, HttpStatus, Logger, NotFoundException, UseFilters } from "@nestjs/common";
+import {
+  ChallengesService
+}                                                                        from "./challenges.service";
+import {
+  EventPattern,
+  Payload,
+  RpcException
+}                                                                        from "@nestjs/microservices";
 import {
   CategoryDto,
   ChallengeDto,
@@ -8,7 +14,10 @@ import {
   CreateChallengeDto,
   PlayerDto,
   UpdateChallengeStatusDto
-}                                                                     from "models";
+} from "models";
+import {
+  DuplicateKeyFilter
+} from "micro-commons";
 
 interface CreateChallengePayload {
   dto: CreateChallengeDto,
@@ -18,6 +27,7 @@ interface CreateChallengePayload {
 }
 
 @Controller()
+@UseFilters(DuplicateKeyFilter)
 export class ChallengesController {
   private readonly logger = new Logger(ChallengesController.name);
 
@@ -54,7 +64,7 @@ export class ChallengesController {
       throw new NotFoundException();
 
     if (challenge.status !== ChallengeStatus.PENDING)
-      throw new BadRequestException("Challenge must be pending");
+      throw new RpcException({ status: HttpStatus.BAD_GATEWAY });
 
     return ( await this.challengeService.update(payload.id, payload.challenge) ).toJSON();
   }
@@ -64,7 +74,7 @@ export class ChallengesController {
     const challenge = await this.challengeService.get(id);
 
     if (challenge === null)
-      throw new NotFoundException();
+      throw new RpcException({ status: HttpStatus.NOT_FOUND });
 
     return this.challengeService.delete(id);
   }

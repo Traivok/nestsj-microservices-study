@@ -1,6 +1,7 @@
 import { Module }                      from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { MongooseModule }              from "@nestjs/mongoose";
+import { DuplicateKeyFilter }          from "./duplicate-key.filter";
 
 @Module({
   imports: [
@@ -15,6 +16,6 @@ import { MongooseModule }              from "@nestjs/mongoose";
       inject:     [ ConfigService ]
     })
   ],
-  exports: []
+  providers: [ DuplicateKeyFilter ]
 })
 export class MicroCommonsModule {}

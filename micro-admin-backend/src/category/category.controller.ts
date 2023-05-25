@@ -1,9 +1,11 @@
-import { Controller, Logger }                                from "@nestjs/common";
+import { Controller, Logger, UseFilters }                    from "@nestjs/common";
 import { CategoryDto, CreateCategoryDto, UpdateCategoryDto } from "models";
 import { CategoryService }                       from "./category.service";
 import { EventPattern, Payload } from "@nestjs/microservices";
+import { DuplicateKeyFilter }                                from "micro-commons";
 
 @Controller()
+@UseFilters(DuplicateKeyFilter)
 export class CategoryController {
   private readonly logger = new Logger(CategoryController.name);
 

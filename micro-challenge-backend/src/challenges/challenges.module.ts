@@ -6,7 +6,6 @@ import { ChallengeSchema }      from "./challenge.schema";
 import { MatchSchema }          from "./match.schema";
 import { MatchesController }    from "./matches.controller";
 
-// TODO fix eslint
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { PlayerSchema }         from "../../../micro-admin-backend/src/players/player.schema";
 // eslint-disable-next-line @nx/enforce-module-boundaries

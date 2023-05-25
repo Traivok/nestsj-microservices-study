@@ -1,6 +1,6 @@
-import { BadRequestException, Injectable, Logger } from "@nestjs/common";
-import { InjectModel }                             from "@nestjs/mongoose";
-import { FilterQuery, Model, UpdateQuery }         from "mongoose";
+import { BadRequestException, HttpStatus, Injectable, Logger } from "@nestjs/common";
+import { InjectModel }                                         from "@nestjs/mongoose";
+import { FilterQuery, Model, UpdateQuery }                     from "mongoose";
 import {
   AssignChallengeMatchDto,
   CategoryDto,
@@ -10,9 +10,10 @@ import {
   MatchDto,
   PlayerDto,
   UpdateChallengeStatusDto
-}                                                  from "models";
-import { Challenge, ChallengeDocument }            from "./challenge.schema";
-import { MatchDocument }                           from "./match.schema";
+}                                                              from "models";
+import { Challenge, ChallengeDocument }                        from "./challenge.schema";
+import { MatchDocument }                                       from "./match.schema";
+import { RpcException }                                        from "@nestjs/microservices";
 
 @Injectable()
 export class ChallengesService {
@@ -68,19 +69,18 @@ export class ChallengesService {
     const challenge = await this.get(challengeId);
 
     if (challenge.status === ChallengeStatus.COMPLETED)
-      throw new BadRequestException("Already completed");
+      throw new RpcException({ status: HttpStatus.BAD_GATEWAY });
 
     if (challenge.status !== ChallengeStatus.ACCEPTED)
-      throw new BadRequestException("Must be accepted");
+      throw new RpcException({ status: HttpStatus.BAD_GATEWAY });
 
     const playersIds = [
       challenge.challenger.toString(),
       challenge.challenger.toString()
     ];
 
-    if (!playersIds.includes(match.winner)) {
-      throw new BadRequestException("Winner not found in challenge");
-    }
+    if (!playersIds.includes(match.winner))
+      throw new RpcException({ status: HttpStatus.BAD_GATEWAY });
 
     const newMath   = new this.matchModel(match);
     challenge.match = ( await newMath.save() ).id;
