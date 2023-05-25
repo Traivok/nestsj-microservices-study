@@ -12,10 +12,10 @@ export type CategoryDocument = HydratedDocument<Category>;
 })
 export class Category {
   @Prop({ unique: true })
-  category: string;
+  category!: string;
 
   @Prop()
-  description: string;
+  description!: string;
 
   @Prop([
     {
@@ -28,7 +28,7 @@ export class Category {
     name: string;
     operation: string;
     value: number;
-  }[];
+  }[] = [];
 }
 
 export const CategorySchema = SchemaFactory.createForClass(Category);

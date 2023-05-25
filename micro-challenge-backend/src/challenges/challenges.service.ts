@@ -11,9 +11,8 @@ import {
   PlayerDto,
   UpdateChallengeStatusDto
 }                                                              from "models";
-import { Challenge, ChallengeDocument }                        from "./challenge.schema";
-import { MatchDocument }                                       from "./match.schema";
 import { RpcException }                                        from "@nestjs/microservices";
+import { ChallengeDocument, MatchDocument }                    from "mongo-schemas";
 
 @Injectable()
 export class ChallengesService {

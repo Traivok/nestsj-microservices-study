@@ -1,7 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { HydratedDocument }  from "mongoose";
-import { Player }                      from "../../../micro-admin-backend/src/players/player.schema";
-import { Category }                    from "../../../micro-admin-backend/src/category/category.schema";
 import { ChallengeStatus }             from "models";
 
 export type ChallengeDocument = HydratedDocument<Challenge>;
@@ -14,8 +12,8 @@ export type ChallengeDocument = HydratedDocument<Challenge>;
   toJSON:     { virtuals: true }
 })
 export class Challenge {
-  @Prop() challengeDate: Date;
-  @Prop() requestDate: Date;
+  @Prop() challengeDate!: Date;
+  @Prop() requestDate!: Date;
   @Prop() acceptDate?: Date;
 
   @Prop({
@@ -24,19 +22,19 @@ export class Challenge {
     enum:     ChallengeStatus,
     default:  ChallengeStatus.PENDING
   })
-  status: string;
+  status!: string;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "Player" })
-  challenger: mongoose.Schema.Types.ObjectId;
+  challenger!: mongoose.Schema.Types.ObjectId;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "Player" })
-  challenged: mongoose.Schema.Types.ObjectId;
+  challenged!: mongoose.Schema.Types.ObjectId;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "Category" })
-  category: mongoose.Schema.Types.ObjectId;
+  category!: mongoose.Schema.Types.ObjectId;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "Match" })
-  match: mongoose.Schema.Types.ObjectId;
+  match!: mongoose.Schema.Types.ObjectId;
 }
 
 export const ChallengeSchema = SchemaFactory.createForClass(Challenge);

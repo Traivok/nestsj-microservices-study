@@ -12,25 +12,25 @@ export type PlayerDocument = HydratedDocument<Player>;
 })
 export class Player {
   @Prop({ unique: true })
-  email: string;
+  email!: string;
 
   @Prop({ unique: true })
-  phoneNumber: string;
+  phoneNumber!: string;
 
   @Prop()
-  name: string;
+  name!: string;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "Category" })
-  category: string;
+  category!: string;
 
   @Prop()
-  ranking: string;
+  ranking!: string;
 
   @Prop()
-  rankingPosition: number;
+  rankingPosition!: number;
 
   @Prop()
-  pictureUrl: string;
+  pictureUrl!: string;
 }
 
 export const PlayerSchema = SchemaFactory.createForClass(Player);

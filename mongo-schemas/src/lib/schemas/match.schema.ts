@@ -13,10 +13,10 @@ export type MatchDocument = HydratedDocument<Match>;
 })
 export class Match {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "Player" })
-  winner: mongoose.Schema.Types.ObjectId;
+  winner!: mongoose.Schema.Types.ObjectId;
 
   @Prop([ { set: String } ])
-  results: Array<ResultDto>;
+  results!: Array<ResultDto>;
 }
 
 
